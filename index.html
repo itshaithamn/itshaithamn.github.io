@@ -8,23 +8,14 @@
     <link rel="stylesheet" href="./styles/poster.css">
 </head>
 <body>
-    <div class="image-container">
-        <img id="poster1" class="poster">
-        <img id="poster2" class="poster">
-        <img id="poster3" class="poster">
-        <img id="poster4" class="poster">
-        <img id="poster5" class="poster">
+    <div id="main-div" class="image-container">
         <script>
             const input = "./data/links.csv";
             let csvData = [];
             
             function setImages() {
                 if (csvData.length > 0) {
-                    document.getElementById("poster1").src = csvData[7].links;
-                    document.getElementById("poster2").src = csvData[4].links;
-                    document.getElementById("poster3").src = csvData[5].links;
-                    document.getElementById("poster4").src = csvData[6].links;
-                    document.getElementById("poster5").src = csvData[8].links;
+                    placeImage(csvData.length);
                 } else {
                     console.error('CSV data is empty.');
                 }
@@ -34,12 +25,21 @@
                 .then(response => response.text())
                 .then(text => {
                     csvData = d3.csvParse(text);
-                    console.log(JSON.stringify(csvData));
                     setImages();
                 })
                 .catch(error => console.error("Error fetching the csv file: ", error));
+
+           function placeImage(x) {
+               var div = document.getElementById("main-div");
+               div.innerHTML = ""; //clear images
+
+               for (counter=0; counter<x; counter++) {
+                   var imagem = document.createElement("img");
+                   imagem.src = csvData[counter].links;
+                   div.appendChild(imagem);
+               }
+          }
         </script>
     </div>
 </body>
 </html>
-
