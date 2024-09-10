@@ -6,41 +6,104 @@
     <title>Hijri Happenings</title>
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <link rel="stylesheet" href="./styles/poster.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        .entrance-page {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateY(-100%);
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 2s ease, opacity 2s ease;
+            z-index: 1; /* Ensures the entrance page is on top */
+        }
+        .entrance-page.hidden {
+            transform: translate(-50%, -50%) translateY(100%);
+            opacity: 0;
+        }
+        .poster-container {
+            display: none;
+            flex-direction: row;
+            align-items: center;
+            padding: 20px;
+            background: #ffffff;
+            border-top: 1px solid #ccc;
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+        .poster-container img {
+            width: 300px;
+            height: auto; /* Adjust height automatically */
+            object-fit: cover; /* Ensures images fit within the set width */
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="row">
-    <div id="main-div" class="image-container">
-        <script>
-            const input = "./data/links.csv";
-            let csvData = [];
-            
-            function setImages() {
-                if (csvData.length > 0) {
-                    placeImage(csvData.length);
-                } else {
-                    console.error('CSV data is empty.');
-                }
-            }
-                                 
-            fetch(input)
-                .then(response => response.text())
-                .then(text => {
-                    csvData = d3.csvParse(text);
-                    setImages();
-                })
-                .catch(error => console.error("Error fetching the csv file: ", error));
-
-           function placeImage(x) {
-               var div = document.getElementById("main-div");
-               div.innerHTML = ""; //clear images
-
-               for (counter=0; counter<x; counter++) {
-                   var imagem = document.createElement("img");
-                   imagem.src = csvData[counter].links;
-                   div.appendChild(imagem);
-               }
-          }
-        </script>
+    <div class="entrance-page" id="entrance-page">
+        <h1>Welcome to Hijri Happenings</h1>
     </div>
+
+    <div id="main-div" class="poster-container">
+        <!-- Posters will be dynamically inserted here -->
+    </div>
+
+    <script>
+        const input = "./data/links.csv";
+        let csvData = [];
+
+        function showPosters() {
+            document.querySelector('.poster-container').style.display = 'flex';
+            if (csvData.length > 0) {
+                placeImage(csvData.length);
+            } else {
+                console.error('CSV data is empty.');
+            }
+        }
+
+        function placeImage(x) {
+            const div = document.getElementById("main-div");
+            div.innerHTML = ""; // Clear images
+
+            for (let counter = 0; counter < x; counter++) {
+                const image = document.createElement("img");
+                image.src = csvData[counter].links;
+                div.appendChild(image);
+            }
+        }
+
+        fetch(input)
+            .then(response => response.text())
+            .then(text => {
+                csvData = d3.csvParse(text);
+                // Start the entrance page animation
+                setTimeout(() => {
+                    document.querySelector('.entrance-page').classList.add('hidden');
+                    // Wait for the animation to complete before showing posters
+                    setTimeout(() => {
+                        document.querySelector('.entrance-page').style.display = 'none';
+                        showPosters();
+                    }, 2000); // Match this delay to the animation duration
+                }, 0);
+            })
+            .catch(error => console.error("Error fetching the csv file: ", error));
+    </script>
 </body>
 </html>
+
